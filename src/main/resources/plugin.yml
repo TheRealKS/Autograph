@@ -1,0 +1,13 @@
+main: com.koens.autograph.Autograph
+name: Autograph
+version: 1.0
+commands:
+  sign:
+    description: request a signing
+    usage: /sign [IGN]
+  autograph:
+    description: accept a sign request
+    usage: /autograph <accept> |deny|sign<msg>|request<IGN>
+  sm:
+    description: sign a player's book
+    usage: /sm [message]
