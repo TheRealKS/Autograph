@@ -13,6 +13,8 @@ public class Autograph extends JavaPlugin {
     private String requesttxt;
     private String requestsenttxt;
     private String requestexpiredtxt;
+    private String requestfilledtxt;
+    private String signconfirmtxt;
     private String accepttxt;
     private String denytxt;
     private String countdowntxt;
@@ -20,6 +22,7 @@ public class Autograph extends JavaPlugin {
     private String norequeststxt;
     private String nothingtosigntxt;
     private int requesttime;
+    private boolean doprefix;
 
     public HashMap<String, Integer> requests;
     public HashMap<String, List<String>> playerbooks;
@@ -32,9 +35,9 @@ public class Autograph extends JavaPlugin {
         playerbooks = new HashMap<String, List<String>>();
         ActionBarAPI actionbar = new ActionBarAPI();
         actionbar.setup();
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-        getCommand("autograph").setAliases(getConfig().getStringList("aliasses"));
-        getCommand("autograph").setExecutor(new AutographCommand(this));
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getCommand("autograph").setAliases(getConfig().getStringList("aliases"));
+        getCommand("autograph").setExecutor(new AutographCommand(this, doprefix));
         getLogger().info("Enabled!");
     }
 
@@ -47,6 +50,8 @@ public class Autograph extends JavaPlugin {
         requesttxt = getConfig().getString("requesttxt");
         requestsenttxt = getConfig().getString("requestsenttxt");
         requestexpiredtxt = getConfig().getString("requestexpiredtxt");
+        requestfilledtxt = getConfig().getString("requestfilledtxt");
+        signconfirmtxt = getConfig().getString("signconfirmtxt");
         accepttxt = getConfig().getString("accepttxt");
         denytxt = getConfig().getString("denytxt");
         countdowntxt = getConfig().getString("countdowntxt");
@@ -54,6 +59,7 @@ public class Autograph extends JavaPlugin {
         norequeststxt = getConfig().getString("norequeststxt");
         nothingtosigntxt = getConfig().getString("nothingtosigntxt");
         requesttime = getConfig().getInt("requesttime");
+        doprefix = getConfig().getBoolean("do-prefix");
     }
     public String getRequesttxt() {
         return requesttxt;
@@ -63,6 +69,12 @@ public class Autograph extends JavaPlugin {
     }
     public String getRequestexpiredtxt() {
         return requestexpiredtxt;
+    }
+    public String getRequestfilledtxt() {
+        return requestfilledtxt;
+    }
+    public String getSignconfirmtxt() {
+        return signconfirmtxt;
     }
     public String getDenytxt() {
         return denytxt;
@@ -101,5 +113,14 @@ public class Autograph extends JavaPlugin {
 
     public void putIntoBooksMap(String player, List<String> pages) {
         playerbooks.put(player, pages);
+    }
+    public List<String> getFromBooksMap(String key) {
+        return playerbooks.get(key);
+    }
+    public void removeFromBooksMap(String key) {
+        playerbooks.remove(key);
+    }
+    public boolean hasBooksMap(String key) {
+        return playerbooks.containsKey(key);
     }
 }
