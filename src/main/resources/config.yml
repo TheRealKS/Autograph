@@ -4,7 +4,8 @@ requestexpiredtxt: "Your request to %PLAYER% has expired!"
 accepttxt: "%PLAYER% has accepted your autograph request! Send a message using /sm!"
 denytxt: "%PLAYER% has denied your autograph request! :("
 countdowntxt: "Your autograph request to %PLAYER% expires in %TIME% second(s)!"
-norequeststxt: "You currently don't have any requests running!"
+norequeststxt: "You currently don't have any requests pending!"
+nothingtosigntxt: "You currently don't have any books available to sign!"
 #In seconds
 requesttime: 20
 
