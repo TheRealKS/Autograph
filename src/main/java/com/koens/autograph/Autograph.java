@@ -25,6 +25,7 @@ public class Autograph extends JavaPlugin {
     private String nothingtosigntxt;
     private int requesttime;
     private boolean doprefix;
+    private boolean alwaysgiveonjoin;
 
     public HashMap<String, Integer> requests;
     public HashMap<String, ItemStack> playerbooks;
@@ -37,7 +38,7 @@ public class Autograph extends JavaPlugin {
         playerbooks = new HashMap<String, ItemStack>();
         ActionBarAPI actionbar = new ActionBarAPI();
         actionbar.setup();
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, alwaysgiveonjoin), this);
         final AutographCommand maincmd = new AutographCommand(this, doprefix);
         final InfoCommand info = new InfoCommand();
         getCommand("autograph").setExecutor(maincmd);
@@ -71,6 +72,7 @@ public class Autograph extends JavaPlugin {
         nothingtosigntxt = getConfig().getString("nothingtosigntxt");
         requesttime = getConfig().getInt("requesttime");
         doprefix = getConfig().getBoolean("do-prefix");
+        alwaysgiveonjoin = getConfig().getBoolean("always-give-on-join");
     }
 
     public String getRequesttxt() {

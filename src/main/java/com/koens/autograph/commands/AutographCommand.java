@@ -14,8 +14,10 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("Since15")
 public class AutographCommand implements CommandExecutor {
 
     private Autograph plugin;
@@ -35,7 +37,7 @@ public class AutographCommand implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if (commandSender instanceof Player) {
             Player p = (Player) commandSender;
-            if (args.length == 2) {
+            if (args.length >= 2) {
                 if (args[0].equalsIgnoreCase("sign")) {
                     if (!p.hasPermission("autograph.sign")) {
                         p.sendMessage(ChatColor.RED + "You don't have access to that command!");
@@ -56,7 +58,12 @@ public class AutographCommand implements CommandExecutor {
                             p.sendMessage(PREFIX + "This person doesn't have enough space in their autograph book!");
                             return true;
                         }
-                        meta.addPage(args[1]);
+                        args = Arrays.copyOfRange(args, 1, args.length);
+                        StringBuilder sb = new StringBuilder();
+                        for (String s1 : args) {
+                            sb.append(s1 + " ");
+                        }
+                        meta.addPage(sb.toString());
                         gotbook.setItemMeta(meta);
                         Player pla = getPlayer(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         if (pla != null) {
@@ -74,6 +81,11 @@ public class AutographCommand implements CommandExecutor {
                         p.sendMessage(PREFIX + plugin.getNothingtosigntxt());
                     }
                 } else if (args[0].equalsIgnoreCase("request")) {
+                    if (args.length > 2) {
+                        p.sendMessage(ChatColor.RED + "You have entered an invalid amount of arguments!");
+                        p.sendMessage(USAGE.replace("%COMMAND%", command.getName()));
+                        return true;
+                    }
                     if (!p.hasPermission("autograph.request")) {
                         p.sendMessage(ChatColor.RED + "You don't have access to that command!");
                         return true;
@@ -111,6 +123,7 @@ public class AutographCommand implements CommandExecutor {
                             }, 20L, 20L);
                             player.setMetadata("runningRequestTimerID", new FixedMetadataValue(plugin, timerID));
                             player.setMetadata("runningRequestSender", new FixedMetadataValue(plugin, p.getName()));
+                            break;
                         } else {
                             p.sendMessage(PREFIX + "That player doesn't exist or is not online!");
                         }
@@ -192,6 +205,7 @@ public class AutographCommand implements CommandExecutor {
                             }
                         }
                         if (sender != null) {
+                            ActionBarAPI.sendActionBar(sender, plugin.getDenytxt().replace("%PLAYER%", p.getName()));
                             sender.sendMessage(PREFIX + plugin.getDenytxt().replace("%PLAYER%", p.getName()));
                         } else {
                             p.sendMessage(PREFIX + "Something went wrong while denying the request!");

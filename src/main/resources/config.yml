@@ -15,3 +15,6 @@ requesttime: 20
 book-name: "Autograph Book"
 
 do-prefix: true
+
+#Set if a book will always be given on server join, or if we first check if the player already has a book
+always-give-on-join: false
