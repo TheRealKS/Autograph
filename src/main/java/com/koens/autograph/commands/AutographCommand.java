@@ -49,7 +49,6 @@ public class AutographCommand implements CommandExecutor {
                         }
                         plugin.getLogger().info(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         List<String> pages = plugin.getFromBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
-                        p.sendMessage(pages.toString());
                         if (plugin.hasBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString())) {
                             plugin.getLogger().info("has");
                         }
@@ -57,15 +56,14 @@ public class AutographCommand implements CommandExecutor {
                             p.sendMessage(PREFIX + "This person doesn't have enough space in their autograph book!");
                             return true;
                         }
-                        p.sendMessage(args[1]);
-                        pages.add(args[1]);
-                        ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
-                        book.getItemMeta().setDisplayName("Autograph Book");
+                        ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);;
                         List<String> lores = new ArrayList<String>();
                         lores.add(ChatColor.AQUA + "Autographs go here!");
-                        book.getItemMeta().setLore(lores);
                         BookMeta meta = (BookMeta) book.getItemMeta();
+                        meta.setDisplayName(plugin.getBookname());
+                        meta.setLore(lores);
                         meta.setPages(pages);
+                        meta.addPage(args[1]);
                         book.setItemMeta(meta);
                         Player pla = getPlayer(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         if (pla != null) {
@@ -77,7 +75,7 @@ public class AutographCommand implements CommandExecutor {
                         plugin.removeFromRequestsMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         p.removeMetadata("acceptedSignRequest", plugin);
                         p.removeMetadata("acceptedSignRequestFor", plugin);
-                        p.sendMessage(PREFIX + plugin.getSignconfirmtxt());
+                        p.sendMessage(PREFIX + plugin.getSignconfirmtxt().replace("%PLAYER%", pla.getName()));
                     } else {
                         p.sendMessage(PREFIX + plugin.getNothingtosigntxt());
                     }
@@ -141,7 +139,7 @@ public class AutographCommand implements CommandExecutor {
                                 break;
                             }
                         } if (sender != null) {
-                            sender.sendMessage(PREFIX + plugin.getAccepttxt());
+                            sender.sendMessage(PREFIX + plugin.getAccepttxt().replace("%PLAYER%", p.getName()));
                             sender.setMetadata("acceptedSignRequest", new FixedMetadataValue(plugin, true));
                             sender.setMetadata("acceptedSignRequestFor", new FixedMetadataValue(plugin, p.getName()));
                             ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
@@ -153,22 +151,32 @@ public class AutographCommand implements CommandExecutor {
                             ItemStack[] invcontents = p.getInventory().getContents();
                             boolean found = false;
                             for (int i = 0; i < invcontents.length; i++) {
-                                if (invcontents[i] != null) {
-                                    if (invcontents[i].getItemMeta().hasDisplayName() && invcontents[i].getItemMeta().hasLore()) {
-                                        if (invcontents[i].getItemMeta().getDisplayName().equals(plugin.getBookname()) && invcontents[i].getItemMeta().getLore().equals(lores) && invcontents[i].getType().equals(Material.BOOK_AND_QUILL)) {
-                                            mirror = invcontents[i].clone();
-                                            p.getInventory().remove(book);
-                                            found = true;
-                                            break;
-                                        }
-                                    }
+                                if (invcontents[i] == null)
+                                    continue;
+                                if (!invcontents[i].hasItemMeta())
+                                    continue;
+                                if (!invcontents[i].getItemMeta().hasDisplayName())
+                                    continue;
+                                if (invcontents[i].getItemMeta().getDisplayName().equals(plugin.getBookname())) {
+                                    p.sendMessage(invcontents[i].getType().name());
+                                    p.sendMessage(Integer.toString(i));
+                                    mirror = p.getInventory().getItem(i);
+                                    p.getInventory().remove(Material.BOOK_AND_QUILL);
+                                    p.updateInventory();
+                                    found = true;
+                                    break;
                                 }
                             }
                             if (!found){
                                 p.sendMessage(PREFIX + "It seems like you have lost your autograph book! Relog to get a new one!");
                             } else {
                                 BookMeta meta = (BookMeta) mirror.getItemMeta();
-                                plugin.putIntoBooksMap(p.getName(), meta.getPages());
+                                List<String> pages = new ArrayList<String>();
+                                for (int i = 1; i < meta.getPageCount(); i++) {
+                                    p.sendMessage(Integer.toString(i));
+                                    pages.add(meta.getPage(i));
+                                }
+                                plugin.putIntoBooksMap(p.getName(), pages);
                             }
 
                         } else {
@@ -193,7 +201,7 @@ public class AutographCommand implements CommandExecutor {
                                 break;
                             }
                         } if (sender != null) {
-                            sender.sendMessage(PREFIX + plugin.getDenytxt());
+                            sender.sendMessage(PREFIX + plugin.getDenytxt().replace("%PLAYER%", p.getName()));
                         } else {
                             p.sendMessage(PREFIX + "Something went wrong while denying the request!");
                         }

@@ -27,7 +27,6 @@ public class PlayerJoinListener implements Listener {
             List<String> lores = new ArrayList<String>();
             lores.add(ChatColor.AQUA + "Autographs go here!");
             BookMeta meta = (BookMeta) book.getItemMeta();
-            List<String> pages = new ArrayList<String>();
             meta.setDisplayName(plugin.getBookname());
             meta.setLore(lores);
             book.setItemMeta(meta);
