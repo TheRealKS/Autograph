@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 
-public class ActionBarAPI  implements Listener {
+public class ActionBarAPI implements Listener {
     public static Plugin plugin;
     public static boolean works = true;
     public static String nmsver;

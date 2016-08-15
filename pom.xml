@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.koens</groupId>
-    <artifactId>TheMagicalAutograph</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>Autograph</artifactId>
+    <version>1.0.0</version>
 
     <repositories>
         <repository>

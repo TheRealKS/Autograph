@@ -1,17 +1,26 @@
 main: com.koens.autograph.Autograph
 author: TheRealKS123
 name: Autograph
-version: 1.0
+version: 1.0.0
 commands:
-  sign:
-    description: request a signing
-    usage: /sign [IGN]
   autograph:
     description: accept a sign request
     usage: /autograph <accept> |deny|sign<msg>|request<IGN>
-  sm:
-    description: sign a player's book
-    usage: /sm [message]
+  a:
+    description: accept a sign request
+    usage: /autograph <accept> |deny|sign<msg>|request<IGN>
+  sign:
+    description: accept a sign request
+    usage: /autograph <accept> |deny|sign<msg>|request<IGN>
+  signature:
+    description: accept a sign request
+    usage: /autograph <accept> |deny|sign<msg>|request<IGN>
+  ainfo:
+    description: display info about the plugin
+    usage: /ainfo
+  autographinfo:
+    description: display info about the plugin
+    usage: /ainfo
 permissions:
   autograph.*:
     description: Gives access to all autograph commands

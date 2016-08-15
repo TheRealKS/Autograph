@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class AutographCommand implements CommandExecutor {
         if (commandSender instanceof Player) {
             Player p = (Player) commandSender;
             if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("sign")){
+                if (args[0].equalsIgnoreCase("sign")) {
                     if (!p.hasPermission("autograph.sign")) {
                         p.sendMessage(ChatColor.RED + "You don't have access to that command!");
                         return true;
@@ -48,31 +47,26 @@ public class AutographCommand implements CommandExecutor {
                             return true;
                         }
                         plugin.getLogger().info(p.getMetadata("acceptedSignRequestFor").get(0).asString());
-                        List<String> pages = plugin.getFromBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
+                        ItemStack gotbook = plugin.getFromBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
+                        BookMeta meta = (BookMeta) gotbook.getItemMeta();
                         if (plugin.hasBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString())) {
                             plugin.getLogger().info("has");
                         }
-                        if (pages.size() == 50) {
+                        if (meta.getPageCount() == 50) {
                             p.sendMessage(PREFIX + "This person doesn't have enough space in their autograph book!");
                             return true;
                         }
-                        ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);;
-                        List<String> lores = new ArrayList<String>();
-                        lores.add(ChatColor.AQUA + "Autographs go here!");
-                        BookMeta meta = (BookMeta) book.getItemMeta();
-                        meta.setDisplayName(plugin.getBookname());
-                        meta.setLore(lores);
-                        meta.setPages(pages);
                         meta.addPage(args[1]);
-                        book.setItemMeta(meta);
+                        gotbook.setItemMeta(meta);
                         Player pla = getPlayer(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         if (pla != null) {
-                            pla.getInventory().addItem(book);
+                            pla.getInventory().addItem(gotbook);
                             pla.sendMessage(PREFIX + plugin.getRequestfilledtxt().replace("%PLAYER%", p.getName()));
                         } else {
                             p.sendMessage(PREFIX + "OOPS! Something went wrong!");
                         }
                         plugin.removeFromRequestsMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
+                        plugin.removeFromBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         p.removeMetadata("acceptedSignRequest", plugin);
                         p.removeMetadata("acceptedSignRequestFor", plugin);
                         p.sendMessage(PREFIX + plugin.getSignconfirmtxt().replace("%PLAYER%", pla.getName()));
@@ -85,9 +79,13 @@ public class AutographCommand implements CommandExecutor {
                         return true;
                     }
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        final Player pl = player;
                         final Player target = p;
                         if (player.getName().equals(args[1])) {
+                            if (plugin.doesRequestMapContain(player.getName())) {
+                                p.sendMessage(PREFIX + plugin.getRequestalreadyrunningtxt());
+                                return true;
+                            }
+                            final Player pl = player;
                             p.sendMessage(PREFIX + plugin.getRequestsenttxt().replace("%PLAYER%", pl.getName()));
                             pl.sendMessage(PREFIX + plugin.getRequesttxt().replace("%PLAYER%", p.getName()));
                             t = plugin.getRequesttime();
@@ -95,7 +93,6 @@ public class AutographCommand implements CommandExecutor {
                             plugin.putIntoRequestsMap(requestname, t);
                             timerID = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
                                 public void run() {
-                                    plugin.getLogger().info(Integer.toString(t));
                                     plugin.putIntoRequestsMap(requestname, t);
                                     String msg = plugin.getCountdowntxt();
                                     msg = msg.replace("%PLAYER%", pl.getName());
@@ -115,7 +112,7 @@ public class AutographCommand implements CommandExecutor {
                             player.setMetadata("runningRequestTimerID", new FixedMetadataValue(plugin, timerID));
                             player.setMetadata("runningRequestSender", new FixedMetadataValue(plugin, p.getName()));
                         } else {
-
+                            p.sendMessage(PREFIX + "That player doesn't exist or is not online!");
                         }
                     }
                 } else {
@@ -138,7 +135,8 @@ public class AutographCommand implements CommandExecutor {
                                 sender = player;
                                 break;
                             }
-                        } if (sender != null) {
+                        }
+                        if (sender != null) {
                             sender.sendMessage(PREFIX + plugin.getAccepttxt().replace("%PLAYER%", p.getName()));
                             sender.setMetadata("acceptedSignRequest", new FixedMetadataValue(plugin, true));
                             sender.setMetadata("acceptedSignRequestFor", new FixedMetadataValue(plugin, p.getName()));
@@ -158,8 +156,6 @@ public class AutographCommand implements CommandExecutor {
                                 if (!invcontents[i].getItemMeta().hasDisplayName())
                                     continue;
                                 if (invcontents[i].getItemMeta().getDisplayName().equals(plugin.getBookname())) {
-                                    p.sendMessage(invcontents[i].getType().name());
-                                    p.sendMessage(Integer.toString(i));
                                     mirror = p.getInventory().getItem(i);
                                     p.getInventory().remove(Material.BOOK_AND_QUILL);
                                     p.updateInventory();
@@ -167,16 +163,10 @@ public class AutographCommand implements CommandExecutor {
                                     break;
                                 }
                             }
-                            if (!found){
+                            if (!found) {
                                 p.sendMessage(PREFIX + "It seems like you have lost your autograph book! Relog to get a new one!");
                             } else {
-                                BookMeta meta = (BookMeta) mirror.getItemMeta();
-                                List<String> pages = new ArrayList<String>();
-                                for (int i = 1; i < meta.getPageCount(); i++) {
-                                    p.sendMessage(Integer.toString(i));
-                                    pages.add(meta.getPage(i));
-                                }
-                                plugin.putIntoBooksMap(p.getName(), pages);
+                                plugin.putIntoBooksMap(p.getName(), mirror);
                             }
 
                         } else {
@@ -200,7 +190,8 @@ public class AutographCommand implements CommandExecutor {
                                 sender = player;
                                 break;
                             }
-                        } if (sender != null) {
+                        }
+                        if (sender != null) {
                             sender.sendMessage(PREFIX + plugin.getDenytxt().replace("%PLAYER%", p.getName()));
                         } else {
                             p.sendMessage(PREFIX + "Something went wrong while denying the request!");
