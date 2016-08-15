@@ -3,7 +3,10 @@ package com.koens.autograph;
 import com.koens.autograph.actionbar.ActionBarAPI;
 import com.koens.autograph.commands.AutographCommand;
 import com.koens.autograph.commands.InfoCommand;
+import com.koens.autograph.listeners.PlayerDropItemListener;
+import com.koens.autograph.listeners.PlayerInventoryClickListener;
 import com.koens.autograph.listeners.PlayerJoinListener;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,6 +27,7 @@ public class Autograph extends JavaPlugin {
     private String norequeststxt;
     private String nothingtosigntxt;
     private int requesttime;
+    private int bookslot;
     private boolean doprefix;
     private boolean alwaysgiveonjoin;
 
@@ -39,6 +43,8 @@ public class Autograph extends JavaPlugin {
         ActionBarAPI actionbar = new ActionBarAPI();
         actionbar.setup();
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, alwaysgiveonjoin), this);
+        getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerInventoryClickListener(this), this);
         final AutographCommand maincmd = new AutographCommand(this, doprefix);
         final InfoCommand info = new InfoCommand();
         getCommand("autograph").setExecutor(maincmd);
@@ -71,6 +77,7 @@ public class Autograph extends JavaPlugin {
         norequeststxt = getConfig().getString("norequeststxt");
         nothingtosigntxt = getConfig().getString("nothingtosigntxt");
         requesttime = getConfig().getInt("requesttime");
+        bookslot = getConfig().getInt("book-slot");
         doprefix = getConfig().getBoolean("do-prefix");
         alwaysgiveonjoin = getConfig().getBoolean("always-give-on-join");
     }
@@ -125,6 +132,10 @@ public class Autograph extends JavaPlugin {
 
     public int getRequesttime() {
         return requesttime;
+    }
+
+    public int getBookslot() {
+        return bookslot;
     }
 
     public void putIntoRequestsMap(String key, Integer value) {

@@ -63,7 +63,10 @@ public class AutographCommand implements CommandExecutor {
                         for (String s1 : args) {
                             sb.append(s1 + " ");
                         }
-                        meta.addPage(sb.toString());
+                        if (meta.getPageCount() == 1 && meta.getPage(1).equals(""))
+                            meta.setPage(1, ChatColor.translateAlternateColorCodes('&', sb.toString()));
+                        else
+                            meta.addPage(ChatColor.translateAlternateColorCodes('&', sb.toString()));
                         gotbook.setItemMeta(meta);
                         Player pla = getPlayer(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         if (pla != null) {
@@ -164,13 +167,14 @@ public class AutographCommand implements CommandExecutor {
                             for (int i = 0; i < invcontents.length; i++) {
                                 if (invcontents[i] == null)
                                     continue;
-                                if (!invcontents[i].hasItemMeta())
+                                if (!invcontents[i].hasItemMeta() && !invcontents[i].getType().equals(Material.WRITTEN_BOOK))
                                     continue;
-                                if (!invcontents[i].getItemMeta().hasDisplayName())
+                                BookMeta meta = (BookMeta) invcontents[i].getItemMeta();
+                                if (!meta.hasTitle() && !meta.hasAuthor())
                                     continue;
-                                if (invcontents[i].getItemMeta().getDisplayName().equals(plugin.getBookname())) {
+                                if (meta.getTitle().equals(plugin.getBookname()) && meta.getAuthor().equals(p.getName())) {
                                     mirror = p.getInventory().getItem(i);
-                                    p.getInventory().remove(Material.BOOK_AND_QUILL);
+                                    p.getInventory().remove(Material.WRITTEN_BOOK);
                                     p.updateInventory();
                                     found = true;
                                     break;

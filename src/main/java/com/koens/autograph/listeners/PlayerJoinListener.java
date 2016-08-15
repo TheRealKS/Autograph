@@ -28,38 +28,51 @@ public class PlayerJoinListener implements Listener {
         Player p = event.getPlayer();
         if (event.getPlayer().hasPermission("autograph.receive")) {
             if (alwaysgive) {
-                ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
+                ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
                 List<String> lores = new ArrayList<String>();
                 lores.add(ChatColor.AQUA + "Autographs go here!");
                 BookMeta meta = (BookMeta) book.getItemMeta();
-                meta.setDisplayName(plugin.getBookname());
                 meta.setLore(lores);
+                meta.setAuthor(p.getName());
+                meta.setTitle(plugin.getBookname());
+                meta.addPage("");
                 book.setItemMeta(meta);
-                event.getPlayer().getInventory().addItem(book);
+                if (plugin.getBookslot() > 36) {
+                    event.getPlayer().getInventory().addItem(book);
+                } else {
+                    event.getPlayer().getInventory().setItem(plugin.getBookslot(), book);
+                }
             } else {
                 ItemStack[] invcontents = p.getInventory().getContents();
                 boolean found = false;
                 for (int i = 0; i < invcontents.length; i++) {
                     if (invcontents[i] == null)
                         continue;
-                    if (!invcontents[i].hasItemMeta())
+                    if (!invcontents[i].hasItemMeta() && !invcontents[i].getType().equals(Material.WRITTEN_BOOK))
                         continue;
-                    if (!invcontents[i].getItemMeta().hasDisplayName())
+                    BookMeta meta = (BookMeta) invcontents[i].getItemMeta();
+                    if (!meta.hasTitle() && !meta.hasAuthor())
                         continue;
-                    if (invcontents[i].getItemMeta().getDisplayName().equals(plugin.getBookname())) {
+                    if (meta.getTitle().equals(plugin.getBookname()) && meta.getAuthor().equals(p.getName())) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    ItemStack book = new ItemStack(Material.BOOK_AND_QUILL);
+                    ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
                     List<String> lores = new ArrayList<String>();
                     lores.add(ChatColor.AQUA + "Autographs go here!");
                     BookMeta meta = (BookMeta) book.getItemMeta();
-                    meta.setDisplayName(plugin.getBookname());
                     meta.setLore(lores);
+                    meta.setAuthor(p.getName());
+                    meta.setTitle(plugin.getBookname());
+                    meta.addPage("");
                     book.setItemMeta(meta);
-                    event.getPlayer().getInventory().addItem(book);
+                    if (plugin.getBookslot() > 36) {
+                        event.getPlayer().getInventory().addItem(book);
+                    } else {
+                        event.getPlayer().getInventory().setItem(plugin.getBookslot(), book);
+                    }
                 }
             }
         }

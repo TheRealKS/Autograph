@@ -13,8 +13,10 @@ nothingtosigntxt: "You currently don't have any books available to sign!"
 requesttime: 20
 
 book-name: "Autograph Book"
+book-slot: 0
 
 do-prefix: true
 
 #Set if a book will always be given on server join, or if we first check if the player already has a book
 always-give-on-join: false
+
