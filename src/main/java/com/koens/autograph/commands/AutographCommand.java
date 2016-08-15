@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,10 @@ public class AutographCommand implements CommandExecutor {
             Player p = (Player) commandSender;
             if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("sign")){
+                    if (!p.hasPermission("autograph.sign")) {
+                        p.sendMessage(ChatColor.RED + "You don't have access to that command!");
+                        return true;
+                    }
                     if (p.hasMetadata("acceptedSignRequest") && p.getMetadata("acceptedSignRequest").get(0).asBoolean() && p.hasMetadata("acceptedSignRequestFor")) {
                         if (args[1].length() > 256) {
                             p.sendMessage(PREFIX + "The autograph you provided is invalid: Can be max 256 characters.");
@@ -77,6 +82,10 @@ public class AutographCommand implements CommandExecutor {
                         p.sendMessage(PREFIX + plugin.getNothingtosigntxt());
                     }
                 } else if (args[0].equalsIgnoreCase("request")) {
+                    if (!p.hasPermission("autograph.request")) {
+                        p.sendMessage(ChatColor.RED + "You don't have access to that command!");
+                        return true;
+                    }
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         final Player pl = player;
                         final Player target = p;
@@ -117,6 +126,10 @@ public class AutographCommand implements CommandExecutor {
                 }
             } else if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("accept")) {
+                    if (!p.hasPermission("autograph.accept")) {
+                        p.sendMessage(ChatColor.RED + "You don't have access to that command!");
+                        return true;
+                    }
                     if (plugin.doesRequestMapContain(p.getName())) {
                         plugin.getServer().getScheduler().cancelTask(p.getMetadata("runningRequestTimerID").get(0).asInt());
                         plugin.removeFromRequestsMap(p.getName());
@@ -165,6 +178,10 @@ public class AutographCommand implements CommandExecutor {
                         p.sendMessage(PREFIX + plugin.getNorequeststxt());
                     }
                 } else if (args[0].equalsIgnoreCase("deny")) {
+                    if (!p.hasPermission("autograph.deny")) {
+                        p.sendMessage(ChatColor.RED + "You don't have access to that command!");
+                        return true;
+                    }
                     if (plugin.doesRequestMapContain(p.getName())) {
                         plugin.getServer().getScheduler().cancelTask(p.getMetadata("runningRequestTimerID").get(0).asInt());
                         plugin.removeFromRequestsMap(p.getName());

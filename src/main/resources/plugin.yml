@@ -1,4 +1,5 @@
 main: com.koens.autograph.Autograph
+author: TheRealKS123
 name: Autograph
 version: 1.0
 commands:
@@ -11,3 +12,25 @@ commands:
   sm:
     description: sign a player's book
     usage: /sm [message]
+permissions:
+  autograph.*:
+    description: Gives access to all autograph commands
+    children:
+      autograph.accept: true
+      autograph.deny: true
+      autograph.request: true
+      autograph.sign: true
+  autograph.accept:
+    description: allows you to accept an autograph request
+    default: true
+  autograph.deny:
+    description: allows you to deny an autograph request
+    default: true
+  autograph.request:
+    description: Gives access to autograph requesting
+    default: true
+  autograph.sign:
+   description: allows you to request and sign autograph books
+   default: true
+   children:
+     autograph.request: true
