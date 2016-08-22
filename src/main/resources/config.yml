@@ -20,3 +20,6 @@ do-prefix: true
 #Set if a book will always be given on server join, or if we first check if the player already has a book
 always-give-on-join: false
 
+#Enable this if the standard method for giving a book only once at join isn't working.
+use-dirty-player-registration: false
+

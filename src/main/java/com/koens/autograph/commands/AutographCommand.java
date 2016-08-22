@@ -48,12 +48,8 @@ public class AutographCommand implements CommandExecutor {
                             p.sendMessage(PREFIX + "The autograph you provided is invalid: Can be max 256 characters.");
                             return true;
                         }
-                        plugin.getLogger().info(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         ItemStack gotbook = plugin.getFromBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         BookMeta meta = (BookMeta) gotbook.getItemMeta();
-                        if (plugin.hasBooksMap(p.getMetadata("acceptedSignRequestFor").get(0).asString())) {
-                            plugin.getLogger().info("has");
-                        }
                         if (meta.getPageCount() == 50) {
                             p.sendMessage(PREFIX + "This person doesn't have enough space in their autograph book!");
                             return true;
@@ -70,7 +66,7 @@ public class AutographCommand implements CommandExecutor {
                         gotbook.setItemMeta(meta);
                         Player pla = getPlayer(p.getMetadata("acceptedSignRequestFor").get(0).asString());
                         if (pla != null) {
-                            pla.getInventory().addItem(gotbook);
+                            pla.getInventory().setItem(plugin.getBookslot(), gotbook);
                             pla.sendMessage(PREFIX + plugin.getRequestfilledtxt().replace("%PLAYER%", p.getName()));
                         } else {
                             p.sendMessage(PREFIX + "OOPS! Something went wrong!");

@@ -7,9 +7,12 @@ import com.koens.autograph.listeners.PlayerDropItemListener;
 import com.koens.autograph.listeners.PlayerInventoryClickListener;
 import com.koens.autograph.listeners.PlayerJoinListener;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Autograph extends JavaPlugin {
@@ -30,6 +33,8 @@ public class Autograph extends JavaPlugin {
     private int bookslot;
     private boolean doprefix;
     private boolean alwaysgiveonjoin;
+    private boolean dirtyreg;
+    private YamlConfiguration pfile;
 
     public HashMap<String, Integer> requests;
     public HashMap<String, ItemStack> playerbooks;
@@ -42,7 +47,12 @@ public class Autograph extends JavaPlugin {
         playerbooks = new HashMap<String, ItemStack>();
         ActionBarAPI actionbar = new ActionBarAPI();
         actionbar.setup();
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, alwaysgiveonjoin), this);
+        savePlayerFile();
+        pfile = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "players.yml"));
+        if (dirtyreg) {
+            getLogger().info("You have enabled dirty player registering in the config! Please note that this method is not recommended and should only be used as a last resort!");
+        }
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, alwaysgiveonjoin, dirtyreg), this);
         getServer().getPluginManager().registerEvents(new PlayerDropItemListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerInventoryClickListener(this), this);
         final AutographCommand maincmd = new AutographCommand(this, doprefix);
@@ -63,6 +73,11 @@ public class Autograph extends JavaPlugin {
         getLogger().info("Autograph v." + getDescription().getVersion() + " has been disabled!");
     }
 
+    private void savePlayerFile() {
+        if (!new File(getDataFolder(), "players.yml").exists())
+            saveResource("players.yml", false);
+    }
+
     private void loadConfig() {
         requesttxt = getConfig().getString("requesttxt");
         requestsenttxt = getConfig().getString("requestsenttxt");
@@ -80,6 +95,7 @@ public class Autograph extends JavaPlugin {
         bookslot = getConfig().getInt("book-slot");
         doprefix = getConfig().getBoolean("do-prefix");
         alwaysgiveonjoin = getConfig().getBoolean("always-give-on-join");
+        dirtyreg = getConfig().getBoolean("use-dirty-player-registration");
     }
 
     public String getRequesttxt() {
@@ -136,6 +152,10 @@ public class Autograph extends JavaPlugin {
 
     public int getBookslot() {
         return bookslot;
+    }
+
+    public YamlConfiguration getPfile() {
+        return pfile;
     }
 
     public void putIntoRequestsMap(String key, Integer value) {

@@ -1,7 +1,7 @@
 main: com.koens.autograph.Autograph
 author: TheRealKS123
 name: Autograph
-version: 1.1.0
+version: 1.1.1
 commands:
   autograph:
     description: accept a sign request
@@ -31,15 +31,15 @@ permissions:
       autograph.sign: true
   autograph.accept:
     description: allows you to accept an autograph request
-    default: true
+    default: false
   autograph.deny:
     description: allows you to deny an autograph request
-    default: true
+    default: false
   autograph.request:
     description: Gives access to autograph requesting
-    default: true
+    default: false
   autograph.sign:
    description: allows you to request and sign autograph books
-   default: true
+   default: false
    children:
      autograph.request: true
